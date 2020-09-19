@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{index (pageName='users')}">
+<head>
+    <meta charset="UTF-8">
+    <title>Users</title>
+</head>
+<body>
+<div th:id="${pageConfig.fragments.page}" class="layout-medium" layout:fragment="content" th:fragment="pageFragment">
+    <div th:id="${pageConfig.fragments.form}" class="mb-4" th:fragment="formFragment">
+        <h4 class="mb-4" th:text="#{users}">Users</h4>
+        <form th:id="${pageConfig.components.form}" th:action="@{__${formAction}__}" th:object="${formObject}">
+            <div class="form-row form-group">
+                <div class="row col-5" th:insert="~{core/component/form/input/input-textbox :: text (${pageConfig.dtoFields.email},
+                                                                                                     #{user.email},
+                                                                                                     ${formMode.name() == 'EDIT'},
+                                                                                                     true)}">
+                </div>
+            </div>
+            <div class="form-row form-group">
+                <div class="row col-5" th:insert="~{core/component/form/input/input-textbox :: text (${pageConfig.dtoFields.name},
+                                                                                                     #{user.name},
+                                                                                                     false,
+                                                                                                     true)}">
+                </div>
+            </div>
+            <div class="form-row form-group" th:if="${formObject.email != (#authentication.principal.username)}">
+                <div class="row col-5" th:insert="~{core/component/form/input/input-select-str :: select (${pageConfig.dtoFields.role},
+                                                                                                          #{user.role},
+                                                                                                          ${pageConfig.selectOptions.roleType},
+                                                                                                          *{__${pageConfig.dtoFields.role}__},
+                                                                                                          true)}">
+                </div>
+            </div>
+            <div th:if="${formObject.email == (#authentication.principal.username)}">
+                <input th:id="${pageConfig.dtoFields.role}" type="hidden" class="form-control w-auto"
+                       th:name="${pageConfig.dtoFields.role}" th:value="*{__${pageConfig.dtoFields.role}__}">
+            </div>
+            <div th:replace="~{core/component/form/crud-form-buttons :: buttons (${formMode.name()},
+                                                                                 ${pageConfig.buttons.create},
+                                                                                 ${pageConfig.buttons.saveEdit},
+                                                                                 ${pageConfig.buttons.cancelEdit})}">
+            </div>
+        </form>
+    </div>
+    <div th:id="${pageConfig.fragments.table}" th:fragment="tableFragment">
+        <table th:id="${pageConfig.components.table}">
+            <thead>
+            <tr>
+                <th scope="col"></th>
+                <th scope="col" class="text-center" th:text="#{user.email}">Email</th>
+                <th scope="col" class="text-center" th:text="#{user.name}">Name</th>
+                <th scope="col" class="text-center" th:text="#{user.role}">Role</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+    <div th:replace="~{core/component/modal-confirmation :: modal (${pageConfig.components.confirmationModal},
+                                                                   #{modal.confirmation.delete.title},
+                                                                   #{modal.confirmation.delete.text})}">
+    </div>
+</div>
+</body>
+<th:block layout:fragment="scripts">
+    <script th:inline="javascript">
+        $(document).ready(() => usersController.init([[${pageConfig}]]));
+    </script>
+</th:block>
+</html>

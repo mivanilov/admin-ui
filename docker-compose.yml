@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  admin-ui:
+    depends_on:
+      - admin-db
+    build: .
+    image: admin-ui:stable
+    container_name: admin-ui
+    environment:
+      DB_USER_USERNAME: admin
+      DB_USER_PASSWORD: admin
+      OAUTH2_CLIENT_ID: ${OAUTH2_CLIENT_ID}
+      OAUTH2_CLIENT_SECRET: ${OAUTH2_CLIENT_SECRET}
+      AUTH_TOKEN_SECRET: ${AUTH_TOKEN_SECRET}
+    command: sh -c './wait-for.sh admin-db:5432 -t 60 -- java -Dspring.profiles.active=docker -jar /admin-ui-1.0.0-SNAPSHOT.jar'
+    ports:
+      - '8080:8080'
+  admin-db:
+    image: postgres:12
+    container_name: admin-db
+    restart: always
+    environment:
+      POSTGRES_DB: 'admin_db'
+      POSTGRES_USER: 'admin'
+      POSTGRES_PASSWORD: 'admin'
+    ports:
+      - '5432:5432'
+    volumes:
+      - admin-db-data:/var/lib/postgresql/data
+      - ./docker/db/:/docker-entrypoint-initdb.d
+volumes:
+  admin-db-data:

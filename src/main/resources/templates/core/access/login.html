@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{index (pageName='login')}">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+<div id="login" class="login-container row justify-content-center" layout:fragment="content">
+    <div class="login-content col-md-6">
+        <h1 class="login-title" th:text="#{access.login.title}">Log in to Admin UI</h1>
+        <div class="alert alert-info" th:if="${param.logout}" th:text="#{access.logout.success}">You have been logged out</div>
+        <a class="btn-block social-btn google" th:href="${authUrl}">
+            <img alt="Google" th:src="@{/img/google-logo.png}"/>
+            <span th:text="#{access.login.google}">Log in with Google</span>
+        </a>
+    </div>
+</div>
+</body>
+</html>

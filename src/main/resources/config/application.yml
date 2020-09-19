@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: admin-ui
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/admin_db?stringtype=unspecified
+    username: ${DB_USER_USERNAME}
+    password: ${DB_USER_PASSWORD}
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${OAUTH2_CLIENT_ID}
+            client-secret: ${OAUTH2_CLIENT_SECRET}
+            redirectUri: http://localhost:8080/login/oauth2/code/google
+
+server:
+  compression:
+    enabled: true
+  forward-headers-strategy: native
+
+app:
+  auth:
+    token:
+      secret: ${AUTH_TOKEN_SECRET}
+      expire-ms: 864000000
+    cookie:
+      expire-sec: 86400
+    oauth2:
+      auth-request-cookie-expire-sec: 120
+
+---
+spring:
+  profiles: docker
+
+  datasource:
+    url: jdbc:postgresql://admin-db:5432/admin_db?stringtype=unspecified
+
+---
+spring:
+  profiles: test
+
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:postgresql://localhost/admin_db?stringtype=unspecified
+
+  flyway:
+    locations: classpath:/db/migration/schema
+    schemas: admin_ui

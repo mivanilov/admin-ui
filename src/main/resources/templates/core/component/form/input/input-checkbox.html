@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Form checkbox input</title>
+</head>
+<body>
+<div th:fragment="checkbox (inputName,inputLabel,readonly,isrequired)" th:remove="tag">
+    <div class="col-5 col-form-label text-right">
+        <label th:for="${inputName}" th:text="${inputLabel}">Label:</label>
+        <em class="fa fa-asterisk" th:if="${isrequired}"></em>
+    </div>
+    <div class="col-7">
+        <input class="form-control w-auto h-auto checkbox-mt" type="checkbox"
+               th:id="${inputName}" th:name="${inputName}" th:checked="*{__${inputName}__}" th:readonly="${readonly}" th:errorclass="is-invalid"/>
+        <div th:replace="~{core/component/form/error/input-errors :: errors (${inputName})}"></div>
+    </div>
+</div>
+</body>
+</html>

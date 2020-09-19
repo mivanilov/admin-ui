@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{index (pageName='access-denied')}">
+<head>
+    <meta charset="UTF-8">
+    <title>Access denied</title>
+</head>
+<body>
+<div id="accessDenied" class="text-center" layout:fragment="content">
+    <h1>
+        <span th:text="#{access.denied}">Access denied</span>
+        <i class="far fa-meh-rolling-eyes"></i>
+    </h1>
+    <a href="/" th:href="@{/}" th:text="#{link.back-home}">back to home page</a>
+</div>
+</body>
+</html>

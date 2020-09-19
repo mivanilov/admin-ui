@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{index (pageName='home')}">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+<body>
+<div th:id="home" layout:fragment="content">
+    <h1 class="text-center" th:text="#{home.greeting}">Welcome to Admin UI</h1>
+</div>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{index (pageName='example-read-eager')}">
+<head>
+    <meta charset="UTF-8">
+    <title>Example Read Eager</title>
+</head>
+<body>
+<div th:id="${pageConfig.fragments.page}" class="layout-long" layout:fragment="content" th:fragment="pageFragment">
+    <div th:id="${pageConfig.fragments.form}" class="mb-4" th:fragment="formFragment">
+        <h4 class="mb-4" th:text="#{example.read.eager}">Example Read Eager</h4>
+        <form th:id="${pageConfig.components.form}" th:action="@{__${formAction}__}" th:object="${formObject}">
+            <div class="form-row form-group">
+                <div class="row col-6" th:insert="~{core/component/form/input/input-select-str :: select (${pageConfig.dtoFields.visibility},
+                                                                                                          #{example.visibility},
+                                                                                                          ${pageConfig.selectOptions.visibility},
+                                                                                                          *{__${pageConfig.dtoFields.visibility}__},
+                                                                                                          true)}">
+                </div>
+            </div>
+            <button th:id="${pageConfig.buttons.load}" type="submit" class="btn btn-sm btn-primary"
+                    th:text="#{button.load}">Load
+            </button>
+        </form>
+    </div>
+    <div th:id="${pageConfig.fragments.table}" th:fragment="tableFragment">
+        <table th:id="${pageConfig.components.table}" th:if="${renderTable}">
+            <thead>
+            <tr>
+                <th scope="col"></th>
+                <th scope="col" class="table-col-centered text-center" th:text="#{example.name}">Name</th>
+                <th scope="col" class="table-col-centered text-center" th:text="#{example.visibility}">Visibility</th>
+                <th scope="col" class="table-col-centered text-center" th:text="#{example.create-date}">Create Date</th>
+                <th scope="col" class="table-col-centered text-center" th:text="#{example.example-config-type}">Config Type</th>
+                <th scope="col" class="table-col-centered text-center" th:text="#{example.active}">Active</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+</body>
+<th:block layout:fragment="scripts">
+    <script th:inline="javascript">
+        $(document).ready(() => exampleReadEagerController.init([[${pageConfig}]]));
+    </script>
+</th:block>
+</html>

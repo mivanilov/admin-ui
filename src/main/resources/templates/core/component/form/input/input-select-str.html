@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Form select input using string</title>
+</head>
+<body>
+<div th:fragment="select (inputName,inputLabel,values,selectedValue,required)" th:remove="tag">
+    <div class="col-5 col-form-label text-right">
+        <label th:for="${inputName}" th:text="${inputLabel}">Select:</label>
+        <em class="fa fa-asterisk" th:if="${required}"></em>
+    </div>
+    <div class="col-7">
+        <select class="form-control w-auto" type="text"
+                th:id="${inputName}" th:name="${inputName}" th:errorclass="is-invalid">
+            <option th:each="val : ${__${values}__}"
+                    th:value="${val}"
+                    th:text="${val}"
+                    th:selected="${val == #strings.toString(selectedValue)}">
+            </option>
+        </select>
+        <div th:replace="~{core/component/form/error/input-errors :: errors (${inputName})}"></div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Form errors</title>
+</head>
+<body>
+<div th:fragment="errors (formObject)" th:remove="tag">
+    <p th:if="${#fields.hasErrors(#strings.concat(formObject, '.*'))}"
+       th:errors="${__${formObject}__.*}">
+        Form field error
+    </p>
+</div>
+</body>
+</html>

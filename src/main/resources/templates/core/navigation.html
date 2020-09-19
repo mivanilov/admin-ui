@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <meta charset="UTF-8">
+    <title>Navigation</title>
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark fixed-top navbar-bg-light" th:fragment="navbar">
+    <a class="navbar-brand" th:href="@{/}">
+        <img class="navbar-brand-image" alt="Logo" src="../../static/img/admin-ui-logo.png" th:src="@{/img/admin-ui-logo.png}"/>
+    </a>
+    <div id="navbarSupportedContent" class="collapse navbar-collapse">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item dropdown" th:classappend="(${pageName} == 'example-crud-eager' or ${pageName} == 'example-crud-lazy') ? 'active' : ''">
+                <a id="crudNavbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                   th:text="#{menu.example.crud}">CRUD Examples
+                </a>
+                <div class="dropdown-menu" aria-labelledby="crudNavbarDropdown">
+                    <a class="dropdown-item" th:href="@{/example/crud/eager}"
+                       th:text="#{menu.example.crud.eager}">Example CRUD Eager
+                    </a>
+                    <a class="dropdown-item" th:href="@{/example/crud/lazy}"
+                       th:text="#{menu.example.crud.lazy}">Example CRUD Lazy
+                    </a>
+                </div>
+            </li>
+            <li class="nav-item dropdown" th:classappend="(${pageName} == 'example-read-eager' or ${pageName} == 'example-read-lazy') ? 'active' : ''">
+                <a id="readNavbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                   th:text="#{menu.example.read}">Read Examples
+                </a>
+                <div class="dropdown-menu" aria-labelledby="readNavbarDropdown">
+                    <a class="dropdown-item" th:href="@{/example/read/eager}"
+                       th:text="#{menu.example.read.eager}">Example Read Eager
+                    </a>
+                    <a class="dropdown-item" th:href="@{/example/read/lazy}"
+                       th:text="#{menu.example.read.lazy}">Example Read Lazy
+                    </a>
+                </div>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')" th:classappend="(${pageName} == 'users') ? 'active' : ''">
+                <a class="nav-link" th:href="@{/users}"
+                   th:text="#{menu.users}">Users
+                </a>
+            </li>
+        </ul>
+        <div sec:authorize="!isAuthenticated()">
+            <a role="button" class="btn btn-sm btn-outline-light" th:href="@{/access/login}"
+               th:text="#{button.login}">Log in
+            </a>
+        </div>
+        <div class="custom-control-inline align-items-center my-2 my-lg-0" sec:authorize="isAuthenticated()">
+            <div class="mr-sm-3 text-light">
+                <span>Welcome,</span>
+                <span sec:authentication="principal.name"></span>
+            </div>
+            <a role="button" class="btn btn-sm btn-outline-light" th:href="@{/access/logout}"
+               th:text="#{button.logout}">Log out
+            </a>
+        </div>
+    </div>
+</nav>
+</body>
+</html>
