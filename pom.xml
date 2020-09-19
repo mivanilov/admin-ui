@@ -48,11 +48,13 @@
         <thymeleaf.extras.java8time.version>3.0.4.RELEASE</thymeleaf.extras.java8time.version>
         <auth0.java-jwt.version>3.10.2</auth0.java-jwt.version>
         <apache.commons-lang3.version>3.10</apache.commons-lang3.version>
+        <jakarta.xml.bind.version>2.3.3</jakarta.xml.bind.version>
         <testcontainers.version>1.14.3</testcontainers.version>
 
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
         <jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
+        <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
         <jshint-maven-plugin.version>1.0.0</jshint-maven-plugin.version>
         <minify-maven-plugin.version>1.7.6</minify-maven-plugin.version>
     </properties>
@@ -222,6 +224,18 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>${coveralls-maven-plugin.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>jakarta.xml.bind</groupId>
+                        <artifactId>jakarta.xml.bind-api</artifactId>
+                        <version>${jakarta.xml.bind.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>de.acosix.maven</groupId>

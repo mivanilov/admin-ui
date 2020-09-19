@@ -1,4 +1,4 @@
-# Admin-UI
+# Admin-UI [![Build Status](https://travis-ci.com/mivanilov/admin-ui.svg?branch=master)](https://travis-ci.com/mivanilov/admin-ui) [![Coverage Status](https://coveralls.io/repos/github/mivanilov/admin-ui/badge.svg?branch=master)](https://coveralls.io/github/mivanilov/admin-ui?branch=master)
 This project provides UI for an example configuration management that serves as a reference implementation for any other configuration management.  
 Provided example demonstrates 4 use cases:
 - CRUD eager/lazy
