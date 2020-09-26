@@ -12,7 +12,7 @@ Admin-UI combines Server-side rendering using Spring MVC with Thymeleaf and Clie
 
 ## Configure
 Admin-UI integrates with Google Sign-In, to configure it for a local setup:
-- [create OAuth2 credentials](https://developers.google.com/identity/sign-in/web/sign-in#create_authorization_credentials)
+- [create OAuth2 credentials](https://developers.google.com/identity/protocols/oauth2/openid-connect#appsetup)
     - in "Authorized JavaScript origins" add uri `http://localhost:8080`
     - in "Authorized redirect URIs" add uri `http://localhost:8080/login/oauth2/code/google` 
 - set created OAuth2 credentials to `OAUTH2_CLIENT_ID` and `OAUTH2_CLIENT_SECRET` env variables in [docker-compose.yml](docker-compose.yml)
