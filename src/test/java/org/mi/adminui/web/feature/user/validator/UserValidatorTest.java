@@ -3,7 +3,7 @@ package org.mi.adminui.web.feature.user.validator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mi.adminui.data.feature.user.model.User;
-import org.mi.adminui.security.model.UserPrincipal;
+import org.mi.adminui.security.userdetails.CustomUserDetails;
 import org.mi.adminui.web.feature.user.configuration.UserPageConfig;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -86,14 +86,14 @@ class UserValidatorTest {
         user.setEmail("user@gmail.com");
         user.setName("name");
         user.setRole(User.RoleType.ADMIN);
-        UserPrincipal userPrincipal = UserPrincipal.create(user);
+        CustomUserDetails customUserDetails = CustomUserDetails.create(user);
 
         User userToEdit = new User();
         userToEdit.setEmail("user@gmail.com");
         userToEdit.setName("name");
         userToEdit.setRole(User.RoleType.BUSINESS);
 
-        userValidator.validateEdit(userToEdit, errors, userPrincipal);
+        userValidator.validateEdit(userToEdit, errors, customUserDetails);
 
         verify(errors).rejectValue(USER_ROLE, USER_SELF_ROLE_CHANGE_RESTRICTED);
     }
@@ -105,9 +105,9 @@ class UserValidatorTest {
         userToDelete.setName("name");
         userToDelete.setRole(User.RoleType.ADMIN);
 
-        UserPrincipal userPrincipal = UserPrincipal.create(userToDelete);
+        CustomUserDetails customUserDetails = CustomUserDetails.create(userToDelete);
 
-        userValidator.validateDelete(userToDelete, errors, userPrincipal);
+        userValidator.validateDelete(userToDelete, errors, customUserDetails);
 
         verify(errors).rejectValue(USER_EMAIL, USER_SELF_DELETE_RESTRICTED);
     }

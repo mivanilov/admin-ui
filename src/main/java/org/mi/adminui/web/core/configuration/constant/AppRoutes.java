@@ -7,7 +7,6 @@ public class AppRoutes {
     public static final String ACCESS_LOGIN = "/access/login";
     public static final String ACCESS_LOGOUT = "/access/logout";
     public static final String ACCESS_DENIED = "/access/denied";
-    public static final String ACCESS_LOGIN_SUCCESS = "/access/login-success";
 
     public static final String USERS = "/users";
     public static final String USERS_CREATE = "/users/create";

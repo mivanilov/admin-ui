@@ -2,11 +2,12 @@ package org.mi.adminui;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.mi.adminui.data.feature.user.model.User;
-import org.mi.adminui.security.model.UserPrincipal;
-import org.mi.adminui.security.service.CustomUserDetailsService;
-import org.mi.adminui.security.util.TokenProvider;
+import org.mi.adminui.security.property.AppAuthProperties;
+import org.mi.adminui.security.userdetails.CustomUserDetails;
+import org.mi.adminui.security.userdetails.CustomUserDetailsService;
+import org.mi.adminui.security.util.CookieUtils;
+import org.mi.adminui.security.util.CryptoUtils;
 import org.mi.adminui.testconfiguration.DataTestConfiguration;
-import org.mi.adminui.util.CookieUtils;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,22 +33,24 @@ public class ControllerITBase {
     protected static final String USER_NAME = "username";
     protected static final String USER_EMAIL = "user@gmail.com";
     protected static final User.RoleType USER_ROLE = User.RoleType.ADMIN;
-    protected static final String JWT = "jwt";
+    protected static final String ENCRYPTED_USER_EMAIL = "encryptedUserEmail";
 
-    private UserPrincipal userPrincipal = new UserPrincipal(USER_NAME, USER_EMAIL, List.of(new SimpleGrantedAuthority(USER_ROLE.getSecurityName())));
+    private final CustomUserDetails customUserDetails = new CustomUserDetails(USER_NAME, USER_EMAIL, List.of(new SimpleGrantedAuthority(USER_ROLE.getSecurityName())));
 
     @Autowired
     protected WebApplicationContext webApplicationContext;
+    @Autowired
+    protected AppAuthProperties authProperties;
 
     @Mock
     protected Cookie cookie;
 
     @MockBean
-    protected TokenProvider tokenProvider;
-    @MockBean
     protected CustomUserDetailsService customUserDetailsService;
     @MockBean
     protected CookieUtils cookieUtils;
+    @MockBean
+    protected CryptoUtils cryptoUtils;
 
     protected MockMvc mockMvc;
 
@@ -56,15 +59,13 @@ public class ControllerITBase {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                                       .apply(SecurityMockMvcConfigurers.springSecurity())
                                       .build();
-        mockTokenAuthenticationFilter();
+        mockCustomUserAuthenticationFilter();
     }
 
-    private void mockTokenAuthenticationFilter() {
+    private void mockCustomUserAuthenticationFilter() {
         when(cookieUtils.getCookie(any(), any())).thenReturn(Optional.of(cookie));
-        when(cookieUtils.deserialize(cookie, String.class)).thenReturn(JWT);
-
-        when(tokenProvider.getUserEmailFromToken(JWT)).thenReturn(USER_EMAIL);
-
-        when(customUserDetailsService.loadUserByUsername(USER_EMAIL)).thenReturn(userPrincipal);
+        when(cookie.getValue()).thenReturn(ENCRYPTED_USER_EMAIL);
+        when(cryptoUtils.decrypt(ENCRYPTED_USER_EMAIL, authProperties.getSession().getSecret())).thenReturn(USER_EMAIL);
+        when(customUserDetailsService.loadUserByUsername(USER_EMAIL)).thenReturn(customUserDetails);
     }
 }

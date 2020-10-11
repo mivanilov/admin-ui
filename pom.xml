@@ -46,7 +46,6 @@
         <font-awesome.version>5.10.1</font-awesome.version>
         <thymeleaf.layout.dialect.version>2.4.1</thymeleaf.layout.dialect.version>
         <thymeleaf.extras.java8time.version>3.0.4.RELEASE</thymeleaf.extras.java8time.version>
-        <auth0.java-jwt.version>3.10.2</auth0.java-jwt.version>
         <apache.commons-lang3.version>3.10</apache.commons-lang3.version>
         <jakarta.xml.bind.version>2.3.3</jakarta.xml.bind.version>
         <testcontainers.version>1.14.3</testcontainers.version>
@@ -113,11 +112,6 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.auth0</groupId>
-            <artifactId>java-jwt</artifactId>
-            <version>${auth0.java-jwt.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

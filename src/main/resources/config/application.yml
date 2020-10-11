@@ -1,35 +1,30 @@
 spring:
-  application:
-    name: admin-ui
+  application.name: admin-ui
 
   datasource:
     url: jdbc:postgresql://localhost:5432/admin_db?stringtype=unspecified
     username: ${DB_USER_USERNAME}
     password: ${DB_USER_PASSWORD}
 
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: ${OAUTH2_CLIENT_ID}
-            client-secret: ${OAUTH2_CLIENT_SECRET}
-            redirectUri: http://localhost:8080/login/oauth2/code/google
+  security.oauth2.client.registration:
+    google:
+      client-id: ${OAUTH2_CLIENT_ID}
+      client-secret: ${OAUTH2_CLIENT_SECRET}
+      redirectUri: http://localhost:8080/login/oauth2/code/google
 
 server:
-  compression:
-    enabled: true
+  compression.enabled: true
   forward-headers-strategy: native
 
 app:
   auth:
-    token:
-      secret: ${AUTH_TOKEN_SECRET}
-      expire-ms: 864000000
-    cookie:
-      expire-sec: 86400
+    session:
+      secret: ${USER_SESSION_SECRET}
+      cookie-name: user-session
+      cookie-expire-sec: 86400
     oauth2:
-      auth-request-cookie-expire-sec: 120
+      auth-request-cookie-name: oauth2-auth-request
+      auth-request-cookie-expire-sec: 180
 
 ---
 spring:

@@ -2,7 +2,7 @@ package org.mi.adminui.web.feature.user.validator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.mi.adminui.data.feature.user.model.User;
-import org.mi.adminui.security.model.UserPrincipal;
+import org.mi.adminui.security.userdetails.CustomUserDetails;
 import org.mi.adminui.web.feature.user.configuration.UserPageConfig;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -59,17 +59,17 @@ public class UserValidator implements Validator {
         }
     }
 
-    public void validateEdit(User userToEdit, Errors errors, UserPrincipal userPrincipal) {
+    public void validateEdit(User userToEdit, Errors errors, CustomUserDetails customUserDetails) {
         validate(userToEdit, errors);
 
-        if (userToEdit.getEmail().equals(userPrincipal.getEmail())
-                && !userToEdit.getRole().getSecurityName().equals(userPrincipal.getAuthorities().iterator().next().getAuthority())) {
+        if (userToEdit.getEmail().equals(customUserDetails.getEmail())
+                && !userToEdit.getRole().getSecurityName().equals(customUserDetails.getAuthorities().iterator().next().getAuthority())) {
             errors.rejectValue(USER_ROLE, USER_SELF_ROLE_CHANGE_RESTRICTED);
         }
     }
 
-    public void validateDelete(User userToDelete, Errors errors, UserPrincipal userPrincipal) {
-        if (userToDelete.getEmail().equals(userPrincipal.getEmail())) {
+    public void validateDelete(User userToDelete, Errors errors, CustomUserDetails customUserDetails) {
+        if (userToDelete.getEmail().equals(customUserDetails.getEmail())) {
             errors.rejectValue(USER_EMAIL, USER_SELF_DELETE_RESTRICTED);
         }
     }

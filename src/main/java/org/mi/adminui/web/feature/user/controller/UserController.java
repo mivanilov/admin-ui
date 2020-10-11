@@ -2,8 +2,8 @@ package org.mi.adminui.web.feature.user.controller;
 
 import org.mi.adminui.data.feature.user.model.User;
 import org.mi.adminui.data.feature.user.service.UserService;
-import org.mi.adminui.security.model.UserPrincipal;
-import org.mi.adminui.security.util.AuthenticationFacade;
+import org.mi.adminui.security.userdetails.CustomUserDetails;
+import org.mi.adminui.security.authentication.AuthenticationFacade;
 import org.mi.adminui.web.core.configuration.constant.AppFormMode;
 import org.mi.adminui.web.core.configuration.constant.AppPages;
 import org.mi.adminui.web.core.configuration.constant.AppRoutes;
@@ -137,7 +137,7 @@ public class UserController {
         return TABLE_FRAGMENT_PATH;
     }
 
-    private static UserPrincipal getLoggedInUserPrincipal(AuthenticationFacade authenticationFacade) {
-        return (UserPrincipal) authenticationFacade.getAuthentication().getPrincipal();
+    private static CustomUserDetails getLoggedInUserPrincipal(AuthenticationFacade authenticationFacade) {
+        return (CustomUserDetails) authenticationFacade.getAuthentication().getPrincipal();
     }
 }

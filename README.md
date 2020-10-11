@@ -16,11 +16,12 @@ Admin-UI integrates with Google Sign-In, to configure it for a local setup:
     - in "Authorized JavaScript origins" add uri `http://localhost:8080`
     - in "Authorized redirect URIs" add uri `http://localhost:8080/login/oauth2/code/google` 
 - set created OAuth2 credentials to `OAUTH2_CLIENT_ID` and `OAUTH2_CLIENT_SECRET` env variables in [docker-compose.yml](docker-compose.yml)
-- add your user with Google email to admin_ui database [user](src/main/resources/db/migration/V1_1__data.sql) table  
+- add your user's Google email to admin_ui database [user](src/main/resources/db/migration/V1_1__data.sql) table  
 
-Also set `AUTH_TOKEN_SECRET` env variable in [docker-compose.yml](docker-compose.yml), e.g. `authTokenSecret`.  
-After user authenticates with Google, Admin-UI generates auth token (JWT containing user's gmail address) which is stored in a cookie and is verified on every request.  
-Generated auth token is signed with a secret configured in the app properties where it is set from the `AUTH_TOKEN_SECRET` env variable.
+Also set `USER_SESSION_SECRET` env variable in [docker-compose.yml](docker-compose.yml), e.g. `userSessionSecret`.  
+After user authenticates with Google, Admin-UI creates user's session cookie containing encrypted user's email 
+that is used to load user's identity from the database and set user's Authentication into SecurityContext on every request.  
+User's email stored in user's session cookie is encrypted using a secret configured in the app properties where it is set from the `USER_SESSION_SECRET` env variable.
 
 ## Build
 Maven is required to build Admin-UI.
