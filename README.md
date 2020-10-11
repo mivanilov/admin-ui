@@ -20,7 +20,7 @@ Admin-UI integrates with Google Sign-In, to configure it for a local setup:
 
 Also set `USER_SESSION_SECRET` env variable in [docker-compose.yml](docker-compose.yml), e.g. `userSessionSecret`.  
 After user authenticates with Google, Admin-UI creates user's session cookie containing encrypted user's email 
-that is used to load user's identity from the database and set user's Authentication into SecurityContext on every request.  
+that is used to load user's identity from the database and set user's Authentication into SecurityContext on every request. 
 User's email stored in user's session cookie is encrypted using a secret configured in the app properties where it is set from the `USER_SESSION_SECRET` env variable.
 
 ## Build
