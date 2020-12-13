@@ -14,7 +14,13 @@ var appModal = (() => {
     function confirm() {
         const modalState = appState.modal();
         modalState.callback(modalState.data);
-        _modal(modalState.id).modal('hide');
+        _hide(modalState.id);
+    }
+
+    function _hide(modalId) {
+        _modal(modalId).modal('hide');
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
     }
 
     function _modal(modalId) {

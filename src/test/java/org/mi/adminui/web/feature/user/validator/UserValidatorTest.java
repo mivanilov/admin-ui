@@ -11,6 +11,7 @@ import org.springframework.validation.Errors;
 import org.thymeleaf.util.StringUtils;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -24,7 +25,6 @@ class UserValidatorTest {
     private static final String USER_EMAIL_FORMAT_INCORRECT = "user.error.email-format-incorrect";
     private static final String USER_FIELDS_INPUT_MAX_LENGTH_255 = "common.form-error.input.max-length-255";
     private static final String USER_SELF_ROLE_CHANGE_RESTRICTED = "user.error.self-role-change-restricted";
-    private static final String USER_SELF_DELETE_RESTRICTED = "user.error.self-delete-restricted";
 
     @Mock
     private Errors errors;
@@ -107,8 +107,8 @@ class UserValidatorTest {
 
         CustomUserDetails customUserDetails = CustomUserDetails.create(userToDelete);
 
-        userValidator.validateDelete(userToDelete, errors, customUserDetails);
+        boolean selfDelete = userValidator.isSelfDelete(userToDelete, customUserDetails);
 
-        verify(errors).rejectValue(USER_EMAIL, USER_SELF_DELETE_RESTRICTED);
+        assertTrue(selfDelete);
     }
 }

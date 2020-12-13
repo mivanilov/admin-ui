@@ -6,7 +6,12 @@ var appCrudController = (() => {
         editRecord,
         cancelEditRecord,
         deleteRecord,
-        confirmDeleteRecord
+        confirmDeleteRecord,
+        createCallback,
+        editCallback,
+        saveEditCallback,
+        cancelEditCallback,
+        deleteCallback
     };
 
     function init(pageConfig, tableOptions) {
@@ -31,6 +36,36 @@ var appCrudController = (() => {
         appForm.ajaxSubmit(_pageConfig().urls.delete, appForm.buildAjaxSubmitData(row), _deleteMeta(index));
     }
 
+    function createCallback(responseFragmentId, actionMeta) {
+        appBaseController.handleCallback(responseFragmentId, actionMeta);
+    }
+
+    function editCallback(responseFragmentId, actionMeta) {
+        appBaseController.handleCallback(responseFragmentId, actionMeta);
+
+        if (responseFragmentId === _pageConfig().fragments.form) {
+            appUtil.hideElement(_pageConfig().fragments.table);
+        }
+    }
+
+    function saveEditCallback(responseFragmentId, actionMeta) {
+        appBaseController.handleCallback(responseFragmentId, actionMeta);
+
+        if (responseFragmentId === _pageConfig().fragments.page) {
+            appUtil.showElement(_pageConfig().fragments.table);
+        }
+    }
+
+    function cancelEditCallback(responseFragmentId, actionMeta) {
+        appBaseController.handleCallback(responseFragmentId, actionMeta);
+
+        appUtil.showElement(_pageConfig().fragments.table);
+    }
+
+    function deleteCallback(responseFragmentId, actionMeta) {
+        appBaseController.handleCallback(responseFragmentId, actionMeta);
+    }
+
     function _pageConfig() {
         return appState.pageConfig();
     }
@@ -47,88 +82,61 @@ var appCrudController = (() => {
 
     function _createMeta() {
         return {
-            initForm: true,
             submitMethod: appConst.http.post,
             submitButtonId: _pageConfig().buttons.create,
-            responsePlaceholderId: {
-                success: _pageConfig().fragments.page,
-                error: _pageConfig().fragments.form
-            },
-            successCallback: _createCallback
+            responseCallback: appCrudController.createCallback,
+            responseActionMeta: {
+                page: undefined,
+                form: undefined
+            }
         };
     }
 
     function _editMeta(index) {
         return {
-            initForm: true,
             submitMethod: appConst.http.put,
             submitButtonId: `${_pageConfig().buttons.edit}${index}`,
-            responsePlaceholderId: {
-                success: _pageConfig().fragments.form
-            },
-            successCallback: _editCallback,
-            successResActionMeta: _saveEditMeta()
+            responseCallback: appCrudController.editCallback,
+            responseActionMeta: {
+                page: _createMeta(),
+                form: _saveEditMeta()
+            }
         };
     }
 
     function _saveEditMeta() {
         return {
-            initForm: true,
             submitMethod: appConst.http.patch,
             submitButtonId: _pageConfig().buttons.saveEdit,
-            responsePlaceholderId: {
-                success: _pageConfig().fragments.page,
-                error: _pageConfig().fragments.form
-            },
-            successCallback: _saveEditCallback,
-            successResActionMeta: _createMeta()
+            responseCallback: appCrudController.saveEditCallback,
+            responseActionMeta: {
+                page: _createMeta(),
+                form: undefined
+            }
         };
     }
 
     function _cancelEditMeta() {
         return {
-            initForm: true,
             submitMethod: appConst.http.get,
             submitButtonId: _pageConfig().buttons.cancelEdit,
-            responsePlaceholderId: {
-                success: _pageConfig().fragments.form
-            },
-            successCallback: _cancelEditCallback,
-            successResActionMeta: _createMeta()
+            responseCallback: appCrudController.cancelEditCallback,
+            responseActionMeta: {
+                page: _createMeta(),
+                form: _createMeta()
+            }
         };
     }
 
     function _deleteMeta(index) {
         return {
-            initForm: false,
             submitMethod: appConst.http.delete,
             submitButtonId: `${_pageConfig().buttons.delete}${index}`,
-            responsePlaceholderId: {
-                success: _pageConfig().fragments.table
-            },
-            successCallback: _deleteCallback
+            responseCallback: appCrudController.deleteCallback,
+            responseActionMeta: {
+                page: _createMeta(),
+                form: _createMeta()
+            }
         };
-    }
-
-    function _createCallback() {
-        appTable.initTable();
-    }
-
-    function _editCallback() {
-        appUtil.hideElement(_pageConfig().fragments.table);
-    }
-
-    function _saveEditCallback() {
-        appTable.initTable();
-        appUtil.showElement(_pageConfig().fragments.table);
-    }
-
-    function _cancelEditCallback() {
-        appTable.initTable();
-        appUtil.showElement(_pageConfig().fragments.table);
-    }
-
-    function _deleteCallback() {
-        appTable.initTable();
     }
 })();

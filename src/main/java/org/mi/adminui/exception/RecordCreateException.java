@@ -1,6 +1,10 @@
-package org.mi.adminui.data.core.exception;
+package org.mi.adminui.exception;
 
 public class RecordCreateException extends RuntimeException {
+
+    public RecordCreateException() {
+        super();
+    }
 
     public RecordCreateException(String message) {
         super(message);

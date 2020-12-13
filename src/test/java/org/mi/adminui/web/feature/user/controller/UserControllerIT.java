@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.mi.adminui.ControllerITBase;
 import org.mi.adminui.data.feature.user.model.User;
 import org.mi.adminui.data.feature.user.service.UserService;
+import org.mi.adminui.exception.RecordCreateException;
+import org.mi.adminui.exception.RecordNotFoundException;
 import org.mi.adminui.web.core.configuration.constant.AppFormMode;
 import org.mi.adminui.web.core.configuration.constant.AppRoutes;
 import org.mi.adminui.web.feature.user.configuration.UserPageConfig;
@@ -22,8 +24,12 @@ import static org.mi.adminui.web.core.configuration.constant.AppPageParams.FORM_
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.FORM_MODE;
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.FORM_OBJECT;
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.PAGE_CONFIG;
+import static org.mi.adminui.web.core.configuration.constant.AppPageParams.SUBMIT_ERROR_MESSAGE_KEY;
+import static org.mi.adminui.web.core.configuration.constant.AppPageParams.SUBMIT_ERROR_SHOW;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -108,6 +114,36 @@ class UserControllerIT extends ControllerITBase {
     }
 
     @Test
+    void failToCreateUserWhenRecordAlreadyExists() throws Exception {
+        User user = getUser();
+
+        when(userService.create(user)).thenThrow(new RecordCreateException());
+
+        MockHttpServletRequestBuilder requestBuilder = post(AppRoutes.USERS_CREATE)
+                .param(EMAIL_PARAM, user.getEmail())
+                .param(NAME_PARAM, user.getName())
+                .param(ROLE_PARAM, user.getRole().name());
+
+        mockMvc.perform(requestBuilder)
+               .andExpect(status().isOk())
+               .andExpect(model().attribute(PAGE_CONFIG, UserPageConfig.get()))
+               .andExpect(model().attribute(FORM_MODE, AppFormMode.CREATE))
+               .andExpect(model().attribute(FORM_ACTION, AppRoutes.USERS_CREATE))
+               .andExpect(model().attribute(SUBMIT_ERROR_SHOW, true))
+               .andExpect(model().attribute(SUBMIT_ERROR_MESSAGE_KEY, UserPageConfig.get().submitErrorMessageKeys.errorCreating))
+               .andExpect(model().attribute(UserPageConfig.get().selectOptions.roleType, ROLE_TYPE_SELECT_OPTIONS))
+               .andExpect(content().string(containsString("id=\"" + UserPageConfig.get().fragments.page + "\"")));
+
+        ArgumentCaptor<User> argumentCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userService).create(argumentCaptor.capture());
+        assertAll(
+                () -> assertEquals(user.getEmail(), argumentCaptor.getValue().getEmail()),
+                () -> assertEquals(user.getName(), argumentCaptor.getValue().getName()),
+                () -> assertEquals(user.getRole(), argumentCaptor.getValue().getRole())
+        );
+    }
+
+    @Test
     void editUser() throws Exception {
         User user = getUser();
 
@@ -176,6 +212,37 @@ class UserControllerIT extends ControllerITBase {
     }
 
     @Test
+    void failToSaveUserEditWhenRecordNotFound() throws Exception {
+        User user = getUser();
+
+        when(userService.update(user)).thenThrow(new RecordNotFoundException());
+
+        MockHttpServletRequestBuilder requestBuilder = patch(AppRoutes.USERS_EDIT_SAVE)
+                .param(EMAIL_PARAM, user.getEmail())
+                .param(NAME_PARAM, user.getName())
+                .param(ROLE_PARAM, user.getRole().name());
+
+        mockMvc.perform(requestBuilder)
+               .andExpect(status().isOk())
+               .andExpect(model().attribute(PAGE_CONFIG, UserPageConfig.get()))
+               .andExpect(model().attribute(FORM_MODE, AppFormMode.CREATE))
+               .andExpect(model().attribute(FORM_ACTION, AppRoutes.USERS_CREATE))
+               .andExpect(model().attribute(FORM_OBJECT, new User()))
+               .andExpect(model().attribute(SUBMIT_ERROR_SHOW, true))
+               .andExpect(model().attribute(SUBMIT_ERROR_MESSAGE_KEY, UserPageConfig.get().submitErrorMessageKeys.errorUpdating))
+               .andExpect(model().attribute(UserPageConfig.get().selectOptions.roleType, ROLE_TYPE_SELECT_OPTIONS))
+               .andExpect(content().string(containsString("id=\"" + UserPageConfig.get().fragments.page + "\"")));
+
+        ArgumentCaptor<User> argumentCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userService).update(argumentCaptor.capture());
+        assertAll(
+                () -> assertEquals(user.getEmail(), argumentCaptor.getValue().getEmail()),
+                () -> assertEquals(user.getName(), argumentCaptor.getValue().getName()),
+                () -> assertEquals(user.getRole(), argumentCaptor.getValue().getRole())
+        );
+    }
+
+    @Test
     void cancelUserEdit() throws Exception {
         mockMvc.perform(get(AppRoutes.USERS_EDIT_CANCEL))
                .andExpect(status().isOk())
@@ -200,6 +267,9 @@ class UserControllerIT extends ControllerITBase {
         mockMvc.perform(requestBuilder)
                .andExpect(status().isOk())
                .andExpect(model().attribute(PAGE_CONFIG, UserPageConfig.get()))
+               .andExpect(model().attribute(FORM_MODE, AppFormMode.CREATE))
+               .andExpect(model().attribute(FORM_ACTION, AppRoutes.USERS_CREATE))
+               .andExpect(model().attribute(UserPageConfig.get().selectOptions.roleType, ROLE_TYPE_SELECT_OPTIONS))
                .andExpect(content().string(containsString("id=\"" + UserPageConfig.get().fragments.table + "\"")));
 
         ArgumentCaptor<String> argumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -208,7 +278,7 @@ class UserControllerIT extends ControllerITBase {
     }
 
     @Test
-    void failToDeleteUserWhenInputIsInvalid() throws Exception {
+    void failToDeleteUserWhenSelfDeleting() throws Exception {
         User user = getUser();
 
         MockHttpServletRequestBuilder requestBuilder = delete(AppRoutes.USERS_DELETE)
@@ -219,7 +289,39 @@ class UserControllerIT extends ControllerITBase {
         mockMvc.perform(requestBuilder)
                .andExpect(status().isOk())
                .andExpect(model().attribute(PAGE_CONFIG, UserPageConfig.get()))
-               .andExpect(content().string(containsString("id=\"" + UserPageConfig.get().fragments.table + "\"")));
+               .andExpect(model().attribute(FORM_MODE, AppFormMode.CREATE))
+               .andExpect(model().attribute(FORM_ACTION, AppRoutes.USERS_CREATE))
+               .andExpect(model().attribute(FORM_OBJECT, new User()))
+               .andExpect(model().attribute(SUBMIT_ERROR_SHOW, true))
+               .andExpect(model().attribute(SUBMIT_ERROR_MESSAGE_KEY, UserPageConfig.get().submitErrorMessageKeys.errorDeletingSelf))
+               .andExpect(content().string(containsString("id=\"" + UserPageConfig.get().fragments.page + "\"")));
+    }
+
+    @Test
+    void failToDeleteUserWhenRecordNotFound() throws Exception {
+        User user = getUser();
+        user.setEmail("someuser@gmail.com");
+
+        doThrow(new RecordNotFoundException()).when(userService).delete("someuser@gmail.com");
+
+        MockHttpServletRequestBuilder requestBuilder = delete(AppRoutes.USERS_DELETE)
+                .param(EMAIL_PARAM, user.getEmail())
+                .param(NAME_PARAM, user.getName())
+                .param(ROLE_PARAM, user.getRole().name());
+
+        mockMvc.perform(requestBuilder)
+               .andExpect(status().isOk())
+               .andExpect(model().attribute(PAGE_CONFIG, UserPageConfig.get()))
+               .andExpect(model().attribute(FORM_MODE, AppFormMode.CREATE))
+               .andExpect(model().attribute(FORM_ACTION, AppRoutes.USERS_CREATE))
+               .andExpect(model().attribute(FORM_OBJECT, new User()))
+               .andExpect(model().attribute(SUBMIT_ERROR_SHOW, true))
+               .andExpect(model().attribute(SUBMIT_ERROR_MESSAGE_KEY, UserPageConfig.get().submitErrorMessageKeys.errorDeletingNotFound))
+               .andExpect(content().string(containsString("id=\"" + UserPageConfig.get().fragments.page + "\"")));
+
+        ArgumentCaptor<String> argumentCaptor = ArgumentCaptor.forClass(String.class);
+        verify(userService).delete(argumentCaptor.capture());
+        assertEquals(user.getEmail(), argumentCaptor.getValue());
     }
 
     private User getUser() {

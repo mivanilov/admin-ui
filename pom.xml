@@ -39,7 +39,7 @@
 
         <application.name>${project.artifactId}</application.name>
 
-        <bootstrap.version>4.5.0</bootstrap.version>
+        <bootstrap.version>4.5.3</bootstrap.version>
         <bootstrap-table.version>1.16.0</bootstrap-table.version>
         <jquery.version>3.5.1</jquery.version>
         <popper.version>1.15.0</popper.version>
@@ -48,7 +48,7 @@
         <thymeleaf.extras.java8time.version>3.0.4.RELEASE</thymeleaf.extras.java8time.version>
         <apache.commons-lang3.version>3.10</apache.commons-lang3.version>
         <jakarta.xml.bind.version>2.3.3</jakarta.xml.bind.version>
-        <testcontainers.version>1.14.3</testcontainers.version>
+        <testcontainers.version>1.15.1</testcontainers.version>
 
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>

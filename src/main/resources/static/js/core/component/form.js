@@ -1,13 +1,6 @@
 var appForm = (() => {
     'use strict';
 
-    const responseTypes = {
-        success: 'success',
-        error: 'error',
-        unknown: 'unknown'
-    };
-    Object.freeze(responseTypes);
-
     return {
         registerFormAjaxSubmit,
         ajaxSubmit,
@@ -48,6 +41,10 @@ var appForm = (() => {
             .join('&');
     }
 
+    function _pageConfig() {
+        return appState.pageConfig();
+    }
+
     function _form(formState) {
         return appState.form(formState);
     }
@@ -62,64 +59,35 @@ var appForm = (() => {
     }
 
     function _handleAjaxResponse(response, actionMeta) {
-        const responseType = _resolveResponseType(response, actionMeta);
+        const responseFragmentId = resolveResponseFragmentId(response);
 
-        if (responseType === responseTypes.unknown) {
+        if (!responseFragmentId) {
             _handleUnknownResponse(response);
             return;
         }
 
-        _replaceContent(responseType, response, actionMeta);
-        _invokeCallback(responseType, actionMeta);
-        _initForm(responseType, actionMeta);
+        _replaceContent(responseFragmentId, response);
+        _invokeCallback(responseFragmentId, actionMeta);
 
         appToggle.toggleButton(actionMeta.submitButtonId, true);
     }
 
-    function _resolveResponseType(response, actionMeta) {
-        if (_isSuccessResponse(response, actionMeta.responsePlaceholderId.success)) {
-            return responseTypes.success;
-        } else if (_isErrorResponse(response, actionMeta.responsePlaceholderId.error)) {
-            return responseTypes.error;
-        }
-        return responseTypes.unknown;
-    }
-
-    function _isSuccessResponse(response, responsePlaceholderId) {
-        return _responseStartsWith(response, responsePlaceholderId, 'div');
-    }
-
-    function _isErrorResponse(response, responsePlaceholderId) {
-        return responsePlaceholderId && _responseStartsWith(response, responsePlaceholderId, 'div');
-    }
-
-    function _responseStartsWith(response, responsePlaceholderId, elementName) {
-        return response.startsWith(`<${elementName} id="${responsePlaceholderId}"`);
+    function resolveResponseFragmentId(response) {
+        const responseMatch = response.match('^<div id="([a-zA-Z0-9]+)"');
+        const extractedFragmentId = responseMatch && responseMatch[1];
+        return [_pageConfig().fragments.page, _pageConfig().fragments.form, _pageConfig().fragments.table]
+            .find(fragmentId => fragmentId === extractedFragmentId);
     }
 
     function _handleUnknownResponse(response) {
         response.includes('<div id="login"') === true ? appRedirect.redirectToLogin() : appRedirect.redirectToError();
     }
 
-    function _replaceContent(responseType, response, actionMeta) {
-        if (responseType === responseTypes.success) {
-            $(`#${actionMeta.responsePlaceholderId.success}`).replaceWith(response);
-        } else if (responseType === responseTypes.error) {
-            $(`#${actionMeta.responsePlaceholderId.error}`).replaceWith(response);
-        }
+    function _replaceContent(responseFragmentId, response) {
+        $(`#${responseFragmentId}`).replaceWith(response);
     }
 
-    function _invokeCallback(responseType, actionMeta) {
-        responseType === responseTypes.success && actionMeta.successCallback && actionMeta.successCallback();
-    }
-
-    function _initForm(responseType, actionMeta) {
-        if (actionMeta.initForm) {
-            if (responseType === responseTypes.success && actionMeta.successResActionMeta) {
-                registerFormAjaxSubmit(actionMeta.successResActionMeta);
-            } else {
-                registerFormAjaxSubmit(actionMeta);
-            }
-        }
+    function _invokeCallback(responseFragmentId, actionMeta) {
+        actionMeta.responseCallback && actionMeta.responseCallback(responseFragmentId, actionMeta);
     }
 })();

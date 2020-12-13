@@ -2,12 +2,17 @@ var appReadController = (() => {
     'use strict';
 
     return {
-        init
+        init,
+        loadCallback
     };
 
     function init(pageConfig, tableOptions) {
         appBaseController.init(pageConfig, _mergeTableOptions(tableOptions));
         appForm.registerFormAjaxSubmit(_loadMeta());
+    }
+
+    function loadCallback(responseFragmentId, actionMeta) {
+        appBaseController.handleCallback(responseFragmentId, actionMeta);
     }
 
     function _mergeTableOptions(tableOptions) {
@@ -25,18 +30,13 @@ var appReadController = (() => {
 
     function _loadMeta() {
         return {
-            initForm: false,
             submitMethod: appConst.http.post,
             submitButtonId: _pageConfig().buttons.load,
-            responsePlaceholderId: {
-                success: _pageConfig().fragments.table,
-                error: _pageConfig().fragments.form
-            },
-            successCallback: _loadCallback
+            responseCallback: appReadController.loadCallback,
+            responseActionMeta: {
+                page: undefined,
+                form: undefined
+            }
         };
-    }
-
-    function _loadCallback() {
-        appTable.initTable();
     }
 })();

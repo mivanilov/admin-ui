@@ -1,7 +1,7 @@
 package org.mi.adminui.data.core.service;
 
-import org.mi.adminui.data.core.exception.RecordCreateException;
-import org.mi.adminui.data.core.exception.RecordNotFoundException;
+import org.mi.adminui.exception.RecordCreateException;
+import org.mi.adminui.exception.RecordNotFoundException;
 import org.mi.adminui.data.core.model.CrudEntity;
 import org.mi.adminui.data.core.repository.CrudJpaRepository;
 import org.springframework.dao.EmptyResultDataAccessException;

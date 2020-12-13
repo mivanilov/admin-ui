@@ -8,6 +8,9 @@
 </head>
 <body>
 <div th:id="${pageConfig.fragments.page}" class="layout-long" layout:fragment="content" th:fragment="pageFragment">
+    <div th:if="${submitErrorShow}">
+        <div th:replace="~{core/component/submit-error :: error (${submitErrorMessageKey})}"></div>
+    </div>
     <div th:id="${pageConfig.fragments.form}" class="mb-4" th:fragment="formFragment">
         <h4 class="mb-4" th:text="#{example.crud.lazy}">Example CRUD Lazy</h4>
         <form th:id="${pageConfig.components.form}" th:action="@{__${formAction}__}" th:object="${formObject}">

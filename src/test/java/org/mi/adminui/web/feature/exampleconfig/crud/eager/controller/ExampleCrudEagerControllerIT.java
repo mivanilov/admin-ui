@@ -5,6 +5,8 @@ import org.mi.adminui.ControllerITBase;
 import org.mi.adminui.data.feature.exampleconfig.model.ExampleConfig;
 import org.mi.adminui.data.feature.exampleconfig.model.ExampleConfigType;
 import org.mi.adminui.data.feature.exampleconfig.service.ExampleConfigService;
+import org.mi.adminui.exception.RecordCreateException;
+import org.mi.adminui.exception.RecordNotFoundException;
 import org.mi.adminui.web.core.configuration.constant.AppFormMode;
 import org.mi.adminui.web.core.configuration.constant.AppRoutes;
 import org.mi.adminui.web.feature.exampleconfig.crud.eager.configuration.ExampleCrudEagerPageConfig;
@@ -24,6 +26,11 @@ import static org.mi.adminui.web.core.configuration.constant.AppPageParams.FORM_
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.FORM_MODE;
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.FORM_OBJECT;
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.PAGE_CONFIG;
+import static org.mi.adminui.web.core.configuration.constant.AppPageParams.SUBMIT_ERROR_MESSAGE_KEY;
+import static org.mi.adminui.web.core.configuration.constant.AppPageParams.SUBMIT_ERROR_SHOW;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -134,6 +141,48 @@ class ExampleCrudEagerControllerIT extends ControllerITBase {
     }
 
     @Test
+    void failToCreateExampleConfigWhenRecordAlreadyExists() throws Exception {
+        ExampleConfig exampleConfig = getExampleConfig();
+        exampleConfig.getExampleConfigType().setType(null);
+        exampleConfig.getExampleConfigType().setDescription(null);
+
+        ExampleConfigType exampleConfigType = getExampleConfigType();
+        when(exampleConfigService.findAllExampleConfigTypes()).thenReturn(List.of(exampleConfigType));
+        when(exampleConfigService.create(exampleConfig)).thenThrow(new RecordCreateException());
+
+        MockHttpServletRequestBuilder requestBuilder = post(AppRoutes.EXAMPLE_CRUD_EAGER_CREATE)
+                .param(NAME_PARAM, exampleConfig.getName())
+                .param(VISIBILITY_PARAM, String.valueOf(exampleConfig.getVisibility()))
+                .param(CREATE_DATE_PARAM, String.valueOf(exampleConfig.getCreateDate()))
+                .param(TYPE_PARAM, String.valueOf(exampleConfig.getExampleConfigTypeValue()))
+                .param(ACTIVE_PARAM, String.valueOf(exampleConfig.isActive()));
+
+        mockMvc.perform(requestBuilder)
+               .andExpect(status().isOk())
+               .andExpect(model().attribute(PAGE_CONFIG, ExampleCrudEagerPageConfig.get()))
+               .andExpect(model().attribute(FORM_MODE, AppFormMode.CREATE))
+               .andExpect(model().attribute(FORM_ACTION, AppRoutes.EXAMPLE_CRUD_EAGER_CREATE))
+               .andExpect(model().attribute(FORM_OBJECT, exampleConfig))
+               .andExpect(model().attribute(ExampleCrudEagerPageConfig.get().selectOptions.visibility, Arrays.stream(ExampleConfig.Visibility.values())
+                                                                                                             .map(ExampleConfig.Visibility::name)
+                                                                                                             .collect(Collectors.toList())))
+               .andExpect(model().attribute(ExampleCrudEagerPageConfig.get().selectOptions.exampleConfigType, List.of(exampleConfigType)))
+               .andExpect(model().attribute(SUBMIT_ERROR_SHOW, true))
+               .andExpect(model().attribute(SUBMIT_ERROR_MESSAGE_KEY, ExampleCrudEagerPageConfig.get().submitErrorMessageKeys.errorCreating))
+               .andExpect(content().string(containsString("id=\"" + ExampleCrudEagerPageConfig.get().fragments.form + "\"")));
+
+        ArgumentCaptor<ExampleConfig> argumentCaptor = ArgumentCaptor.forClass(ExampleConfig.class);
+        verify(exampleConfigService).create(argumentCaptor.capture());
+        assertAll(
+                () -> assertEquals(exampleConfig.getName(), argumentCaptor.getValue().getName()),
+                () -> assertEquals(exampleConfig.getVisibility(), argumentCaptor.getValue().getVisibility()),
+                () -> assertEquals(exampleConfig.getCreateDate(), argumentCaptor.getValue().getCreateDate()),
+                () -> assertEquals(exampleConfig.getExampleConfigTypeValue(), argumentCaptor.getValue().getExampleConfigTypeValue()),
+                () -> assertEquals(exampleConfig.isActive(), argumentCaptor.getValue().isActive())
+        );
+    }
+
+    @Test
     void editExampleConfig() throws Exception {
         ExampleConfig exampleConfig = getExampleConfig();
         exampleConfig.setId(1L);
@@ -238,6 +287,51 @@ class ExampleCrudEagerControllerIT extends ControllerITBase {
     }
 
     @Test
+    void failToSaveExampleConfigEditWhenRecordNotFound() throws Exception {
+        ExampleConfig exampleConfig = getExampleConfig();
+        exampleConfig.setId(1L);
+        exampleConfig.getExampleConfigType().setType(null);
+        exampleConfig.getExampleConfigType().setDescription(null);
+
+        ExampleConfigType exampleConfigType = getExampleConfigType();
+        when(exampleConfigService.findAllExampleConfigTypes()).thenReturn(List.of(exampleConfigType));
+        when(exampleConfigService.update(exampleConfig)).thenThrow(new RecordNotFoundException());
+
+        MockHttpServletRequestBuilder requestBuilder = patch(AppRoutes.EXAMPLE_CRUD_EAGER_EDIT_SAVE)
+                .param(ID_PARAM, exampleConfig.getId().toString())
+                .param(NAME_PARAM, exampleConfig.getName())
+                .param(VISIBILITY_PARAM, String.valueOf(exampleConfig.getVisibility()))
+                .param(CREATE_DATE_PARAM, String.valueOf(exampleConfig.getCreateDate()))
+                .param(TYPE_PARAM, String.valueOf(exampleConfig.getExampleConfigTypeValue()))
+                .param(ACTIVE_PARAM, String.valueOf(exampleConfig.isActive()));
+
+        mockMvc.perform(requestBuilder)
+               .andExpect(status().isOk())
+               .andExpect(model().attribute(PAGE_CONFIG, ExampleCrudEagerPageConfig.get()))
+               .andExpect(model().attribute(FORM_MODE, AppFormMode.CREATE))
+               .andExpect(model().attribute(FORM_ACTION, AppRoutes.EXAMPLE_CRUD_EAGER_CREATE))
+               .andExpect(model().attribute(FORM_OBJECT, new ExampleConfig()))
+               .andExpect(model().attribute(ExampleCrudEagerPageConfig.get().selectOptions.visibility, Arrays.stream(ExampleConfig.Visibility.values())
+                                                                                                             .map(ExampleConfig.Visibility::name)
+                                                                                                             .collect(Collectors.toList())))
+               .andExpect(model().attribute(ExampleCrudEagerPageConfig.get().selectOptions.exampleConfigType, List.of(exampleConfigType)))
+               .andExpect(model().attribute(SUBMIT_ERROR_SHOW, true))
+               .andExpect(model().attribute(SUBMIT_ERROR_MESSAGE_KEY, ExampleCrudEagerPageConfig.get().submitErrorMessageKeys.errorUpdating))
+               .andExpect(content().string(containsString("id=\"" + ExampleCrudEagerPageConfig.get().fragments.page + "\"")));
+
+        ArgumentCaptor<ExampleConfig> argumentCaptor = ArgumentCaptor.forClass(ExampleConfig.class);
+        verify(exampleConfigService).update(argumentCaptor.capture());
+        assertAll(
+                () -> assertEquals(exampleConfig.getId(), argumentCaptor.getValue().getId()),
+                () -> assertEquals(exampleConfig.getName(), argumentCaptor.getValue().getName()),
+                () -> assertEquals(exampleConfig.getVisibility(), argumentCaptor.getValue().getVisibility()),
+                () -> assertEquals(exampleConfig.getCreateDate(), argumentCaptor.getValue().getCreateDate()),
+                () -> assertEquals(exampleConfig.getExampleConfigTypeValue(), argumentCaptor.getValue().getExampleConfigTypeValue()),
+                () -> assertEquals(exampleConfig.isActive(), argumentCaptor.getValue().isActive())
+        );
+    }
+
+    @Test
     void cancelExampleConfigEdit() throws Exception {
         ExampleConfigType exampleConfigType = getExampleConfigType();
         when(exampleConfigService.findAllExampleConfigTypes()).thenReturn(List.of(exampleConfigType));
@@ -266,6 +360,36 @@ class ExampleCrudEagerControllerIT extends ControllerITBase {
                .andExpect(status().isOk())
                .andExpect(model().attribute(PAGE_CONFIG, ExampleCrudEagerPageConfig.get()))
                .andExpect(content().string(containsString("id=\"" + ExampleCrudEagerPageConfig.get().fragments.table + "\"")));
+
+        ArgumentCaptor<Long> argumentCaptor = ArgumentCaptor.forClass(Long.class);
+        verify(exampleConfigService).delete(argumentCaptor.capture());
+        assertEquals(Long.parseLong(id), argumentCaptor.getValue());
+    }
+
+    @Test
+    void failToDeleteExampleConfigWhenRecordNotFound() throws Exception {
+        String id = "1";
+
+        ExampleConfigType exampleConfigType = getExampleConfigType();
+        when(exampleConfigService.findAllExampleConfigTypes()).thenReturn(List.of(exampleConfigType));
+        doThrow(new RecordNotFoundException()).when(exampleConfigService).delete(Long.parseLong(id));
+
+        MockHttpServletRequestBuilder requestBuilder = delete(AppRoutes.EXAMPLE_CRUD_EAGER_DELETE)
+                .param(ID_PARAM, id);
+
+        mockMvc.perform(requestBuilder)
+               .andExpect(status().isOk())
+               .andExpect(model().attribute(PAGE_CONFIG, ExampleCrudEagerPageConfig.get()))
+               .andExpect(model().attribute(SUBMIT_ERROR_SHOW, true))
+               .andExpect(model().attribute(SUBMIT_ERROR_MESSAGE_KEY, ExampleCrudEagerPageConfig.get().submitErrorMessageKeys.errorDeleting))
+               .andExpect(model().attribute(FORM_MODE, AppFormMode.CREATE))
+               .andExpect(model().attribute(FORM_ACTION, AppRoutes.EXAMPLE_CRUD_EAGER_CREATE))
+               .andExpect(model().attribute(FORM_OBJECT, new ExampleConfig()))
+               .andExpect(model().attribute(ExampleCrudEagerPageConfig.get().selectOptions.visibility, Arrays.stream(ExampleConfig.Visibility.values())
+                                                                                                             .map(ExampleConfig.Visibility::name)
+                                                                                                             .collect(Collectors.toList())))
+               .andExpect(model().attribute(ExampleCrudEagerPageConfig.get().selectOptions.exampleConfigType, List.of(exampleConfigType)))
+               .andExpect(content().string(containsString("id=\"" + ExampleCrudEagerPageConfig.get().fragments.page + "\"")));
 
         ArgumentCaptor<Long> argumentCaptor = ArgumentCaptor.forClass(Long.class);
         verify(exampleConfigService).delete(argumentCaptor.capture());

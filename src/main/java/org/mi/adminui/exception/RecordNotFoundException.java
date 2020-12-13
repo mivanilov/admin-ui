@@ -1,6 +1,10 @@
-package org.mi.adminui.data.core.exception;
+package org.mi.adminui.exception;
 
 public class RecordNotFoundException extends RuntimeException {
+
+    public RecordNotFoundException() {
+        super();
+    }
 
     public RecordNotFoundException(String message) {
         super(message);

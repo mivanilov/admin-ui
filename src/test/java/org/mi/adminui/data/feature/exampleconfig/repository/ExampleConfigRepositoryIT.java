@@ -1,16 +1,15 @@
 package org.mi.adminui.data.feature.exampleconfig.repository;
 
 import org.junit.jupiter.api.Test;
-import org.mi.adminui.Application;
 import org.mi.adminui.data.feature.exampleconfig.model.ExampleConfig;
 import org.mi.adminui.data.feature.exampleconfig.model.ExampleConfigType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,9 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(classes = {Application.class})
+@DataJpaTest
 @ActiveProfiles("test")
-@Transactional
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ExampleConfigRepositoryIT {
 
     @Autowired

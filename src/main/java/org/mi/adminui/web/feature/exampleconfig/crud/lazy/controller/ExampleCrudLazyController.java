@@ -2,10 +2,11 @@ package org.mi.adminui.web.feature.exampleconfig.crud.lazy.controller;
 
 import org.mi.adminui.data.feature.exampleconfig.model.ExampleConfig;
 import org.mi.adminui.data.feature.exampleconfig.service.ExampleConfigService;
+import org.mi.adminui.exception.RecordCreateException;
+import org.mi.adminui.exception.RecordNotFoundException;
 import org.mi.adminui.web.core.configuration.constant.AppFormMode;
 import org.mi.adminui.web.core.configuration.constant.AppPages;
 import org.mi.adminui.web.core.configuration.constant.AppRoutes;
-import org.mi.adminui.web.feature.exampleconfig.crud.eager.configuration.ExampleCrudEagerPageConfig;
 import org.mi.adminui.web.feature.exampleconfig.crud.lazy.configuration.ExampleCrudLazyPageConfig;
 import org.mi.adminui.web.feature.exampleconfig.crud.lazy.validator.ExampleCrudLazyValidator;
 import org.springframework.stereotype.Controller;
@@ -25,6 +26,8 @@ import static org.mi.adminui.web.core.configuration.constant.AppPageParams.FORM_
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.FORM_MODE;
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.FORM_OBJECT;
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.PAGE_CONFIG;
+import static org.mi.adminui.web.core.configuration.constant.AppPageParams.SUBMIT_ERROR_MESSAGE_KEY;
+import static org.mi.adminui.web.core.configuration.constant.AppPageParams.SUBMIT_ERROR_SHOW;
 
 @Controller
 public class ExampleCrudLazyController {
@@ -65,7 +68,14 @@ public class ExampleCrudLazyController {
             return FORM_FRAGMENT_PATH;
         }
 
-        exampleConfigService.create(exampleConfig);
+        try {
+            exampleConfigService.create(exampleConfig);
+        } catch (RecordCreateException e) {
+            model.addAttribute(SUBMIT_ERROR_SHOW, true);
+            model.addAttribute(SUBMIT_ERROR_MESSAGE_KEY, ExampleCrudLazyPageConfig.get().submitErrorMessageKeys.errorCreating);
+
+            return PAGE_FRAGMENT_PATH;
+        }
 
         model.addAttribute(FORM_OBJECT, new ExampleConfig());
 
@@ -96,7 +106,12 @@ public class ExampleCrudLazyController {
             return FORM_FRAGMENT_PATH;
         }
 
-        exampleConfigService.update(exampleConfig);
+        try {
+            exampleConfigService.update(exampleConfig);
+        } catch (RecordNotFoundException e) {
+            model.addAttribute(SUBMIT_ERROR_SHOW, true);
+            model.addAttribute(SUBMIT_ERROR_MESSAGE_KEY, ExampleCrudLazyPageConfig.get().submitErrorMessageKeys.errorUpdating);
+        }
 
         model.addAttribute(FORM_MODE, AppFormMode.CREATE);
         model.addAttribute(FORM_ACTION, AppRoutes.EXAMPLE_CRUD_LAZY_CREATE);
@@ -120,15 +135,26 @@ public class ExampleCrudLazyController {
     public String deleteExampleConfig(@ModelAttribute(FORM_OBJECT) ExampleConfig exampleConfig, Model model) {
         model.addAttribute(PAGE_CONFIG, ExampleCrudLazyPageConfig.get());
 
-        exampleConfigService.delete(exampleConfig.getId());
+        try {
+            exampleConfigService.delete(exampleConfig.getId());
+        } catch (RecordNotFoundException e) {
+            model.addAttribute(SUBMIT_ERROR_SHOW, true);
+            model.addAttribute(SUBMIT_ERROR_MESSAGE_KEY, ExampleCrudLazyPageConfig.get().submitErrorMessageKeys.errorDeleting);
+            model.addAttribute(FORM_MODE, AppFormMode.CREATE);
+            model.addAttribute(FORM_ACTION, AppRoutes.EXAMPLE_CRUD_LAZY_CREATE);
+            model.addAttribute(FORM_OBJECT, new ExampleConfig());
+            setSelectOptions(model);
+
+            return PAGE_FRAGMENT_PATH;
+        }
 
         return TABLE_FRAGMENT_PATH;
     }
 
     private void setSelectOptions(Model model) {
-        model.addAttribute(ExampleCrudEagerPageConfig.get().selectOptions.visibility, Arrays.stream(ExampleConfig.Visibility.values())
-                                                                                            .map(ExampleConfig.Visibility::name)
-                                                                                            .collect(Collectors.toList()));
-        model.addAttribute(ExampleCrudEagerPageConfig.get().selectOptions.exampleConfigType, exampleConfigService.findAllExampleConfigTypes());
+        model.addAttribute(ExampleCrudLazyPageConfig.get().selectOptions.visibility, Arrays.stream(ExampleConfig.Visibility.values())
+                                                                                           .map(ExampleConfig.Visibility::name)
+                                                                                           .collect(Collectors.toList()));
+        model.addAttribute(ExampleCrudLazyPageConfig.get().selectOptions.exampleConfigType, exampleConfigService.findAllExampleConfigTypes());
     }
 }

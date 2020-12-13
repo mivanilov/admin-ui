@@ -8,6 +8,7 @@ public class ExampleCrudLazyPageConfig extends CrudPageConfig {
     public final DtoFields dtoFields;
     public final SelectOptions selectOptions;
     public final Urls urls;
+    public final SubmitErrorMessageKeys submitErrorMessageKeys;
 
     private static ExampleCrudLazyPageConfig config = null;
 
@@ -16,6 +17,7 @@ public class ExampleCrudLazyPageConfig extends CrudPageConfig {
         dtoFields = new DtoFields();
         selectOptions = new SelectOptions();
         urls = new Urls();
+        submitErrorMessageKeys = new SubmitErrorMessageKeys();
     }
 
     public static ExampleCrudLazyPageConfig get() {
@@ -45,5 +47,11 @@ public class ExampleCrudLazyPageConfig extends CrudPageConfig {
         public final String cancelEdit = AppRoutes.EXAMPLE_CRUD_LAZY_EDIT_CANCEL;
         public final String delete = AppRoutes.EXAMPLE_CRUD_LAZY_DELETE;
         public final String tableRows = AppRoutes.EXAMPLE_CRUD_LAZY_LOAD_ROWS_PAGE;
+    }
+
+    public static class SubmitErrorMessageKeys {
+        public final String errorCreating = "example.error.creating";
+        public final String errorUpdating = "example.error.updating";
+        public final String errorDeleting = "example.error.deleting";
     }
 }

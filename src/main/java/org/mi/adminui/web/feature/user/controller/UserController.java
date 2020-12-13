@@ -2,8 +2,10 @@ package org.mi.adminui.web.feature.user.controller;
 
 import org.mi.adminui.data.feature.user.model.User;
 import org.mi.adminui.data.feature.user.service.UserService;
-import org.mi.adminui.security.userdetails.CustomUserDetails;
+import org.mi.adminui.exception.RecordCreateException;
+import org.mi.adminui.exception.RecordNotFoundException;
 import org.mi.adminui.security.authentication.AuthenticationFacade;
+import org.mi.adminui.security.userdetails.CustomUserDetails;
 import org.mi.adminui.web.core.configuration.constant.AppFormMode;
 import org.mi.adminui.web.core.configuration.constant.AppPages;
 import org.mi.adminui.web.core.configuration.constant.AppRoutes;
@@ -27,6 +29,8 @@ import static org.mi.adminui.web.core.configuration.constant.AppPageParams.FORM_
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.FORM_MODE;
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.FORM_OBJECT;
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.PAGE_CONFIG;
+import static org.mi.adminui.web.core.configuration.constant.AppPageParams.SUBMIT_ERROR_MESSAGE_KEY;
+import static org.mi.adminui.web.core.configuration.constant.AppPageParams.SUBMIT_ERROR_SHOW;
 
 @Controller
 public class UserController {
@@ -74,7 +78,14 @@ public class UserController {
             return FORM_FRAGMENT_PATH;
         }
 
-        userService.create(user);
+        try {
+            userService.create(user);
+        } catch (RecordCreateException e) {
+            model.addAttribute(SUBMIT_ERROR_SHOW, true);
+            model.addAttribute(SUBMIT_ERROR_MESSAGE_KEY, UserPageConfig.get().submitErrorMessageKeys.errorCreating);
+
+            return PAGE_FRAGMENT_PATH;
+        }
 
         model.addAttribute(FORM_OBJECT, new User());
 
@@ -105,7 +116,12 @@ public class UserController {
             return FORM_FRAGMENT_PATH;
         }
 
-        userService.update(user);
+        try {
+            userService.update(user);
+        } catch (RecordNotFoundException e) {
+            model.addAttribute(SUBMIT_ERROR_SHOW, true);
+            model.addAttribute(SUBMIT_ERROR_MESSAGE_KEY, UserPageConfig.get().submitErrorMessageKeys.errorUpdating);
+        }
 
         model.addAttribute(FORM_MODE, AppFormMode.CREATE);
         model.addAttribute(FORM_ACTION, AppRoutes.USERS_CREATE);
@@ -126,12 +142,28 @@ public class UserController {
     }
 
     @DeleteMapping(AppRoutes.USERS_DELETE)
-    public String deleteUser(@ModelAttribute(FORM_OBJECT) User user, BindingResult bindingResult, Model model) {
+    public String deleteUser(@ModelAttribute(FORM_OBJECT) User user, Model model) {
         model.addAttribute(PAGE_CONFIG, UserPageConfig.get());
+        model.addAttribute(FORM_MODE, AppFormMode.CREATE);
+        model.addAttribute(FORM_ACTION, AppRoutes.USERS_CREATE);
+        model.addAttribute(UserPageConfig.get().selectOptions.roleType, ROLE_TYPE_SELECT_OPTIONS);
 
-        userValidator.validateDelete(user, bindingResult, getLoggedInUserPrincipal(authenticationFacade));
-        if (!bindingResult.hasErrors()) {
+        if (userValidator.isSelfDelete(user, getLoggedInUserPrincipal(authenticationFacade))) {
+            model.addAttribute(SUBMIT_ERROR_SHOW, true);
+            model.addAttribute(SUBMIT_ERROR_MESSAGE_KEY, UserPageConfig.get().submitErrorMessageKeys.errorDeletingSelf);
+            model.addAttribute(FORM_OBJECT, new User());
+
+            return PAGE_FRAGMENT_PATH;
+        }
+
+        try {
             userService.delete(user.getId());
+        } catch (RecordNotFoundException e) {
+            model.addAttribute(SUBMIT_ERROR_SHOW, true);
+            model.addAttribute(SUBMIT_ERROR_MESSAGE_KEY, UserPageConfig.get().submitErrorMessageKeys.errorDeletingNotFound);
+            model.addAttribute(FORM_OBJECT, new User());
+
+            return PAGE_FRAGMENT_PATH;
         }
 
         return TABLE_FRAGMENT_PATH;
