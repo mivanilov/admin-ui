@@ -30,7 +30,6 @@ import static org.mi.adminui.web.core.configuration.constant.AppPageParams.FORM_
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.FORM_OBJECT;
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.PAGE_CONFIG;
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.SUBMIT_ERROR_MESSAGE_KEY;
-import static org.mi.adminui.web.core.configuration.constant.AppPageParams.SUBMIT_ERROR_SHOW;
 
 @Controller
 public class UserController {
@@ -81,7 +80,6 @@ public class UserController {
         try {
             userService.create(user);
         } catch (RecordCreateException e) {
-            model.addAttribute(SUBMIT_ERROR_SHOW, true);
             model.addAttribute(SUBMIT_ERROR_MESSAGE_KEY, UserPageConfig.get().submitErrorMessageKeys.errorCreating);
 
             return PAGE_FRAGMENT_PATH;
@@ -119,7 +117,6 @@ public class UserController {
         try {
             userService.update(user);
         } catch (RecordNotFoundException e) {
-            model.addAttribute(SUBMIT_ERROR_SHOW, true);
             model.addAttribute(SUBMIT_ERROR_MESSAGE_KEY, UserPageConfig.get().submitErrorMessageKeys.errorUpdating);
         }
 
@@ -149,7 +146,6 @@ public class UserController {
         model.addAttribute(UserPageConfig.get().selectOptions.roleType, ROLE_TYPE_SELECT_OPTIONS);
 
         if (userValidator.isSelfDelete(user, getLoggedInUserPrincipal(authenticationFacade))) {
-            model.addAttribute(SUBMIT_ERROR_SHOW, true);
             model.addAttribute(SUBMIT_ERROR_MESSAGE_KEY, UserPageConfig.get().submitErrorMessageKeys.errorDeletingSelf);
             model.addAttribute(FORM_OBJECT, new User());
 
@@ -159,7 +155,6 @@ public class UserController {
         try {
             userService.delete(user.getId());
         } catch (RecordNotFoundException e) {
-            model.addAttribute(SUBMIT_ERROR_SHOW, true);
             model.addAttribute(SUBMIT_ERROR_MESSAGE_KEY, UserPageConfig.get().submitErrorMessageKeys.errorDeletingNotFound);
             model.addAttribute(FORM_OBJECT, new User());
 

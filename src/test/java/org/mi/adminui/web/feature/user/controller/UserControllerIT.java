@@ -25,7 +25,6 @@ import static org.mi.adminui.web.core.configuration.constant.AppPageParams.FORM_
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.FORM_OBJECT;
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.PAGE_CONFIG;
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.SUBMIT_ERROR_MESSAGE_KEY;
-import static org.mi.adminui.web.core.configuration.constant.AppPageParams.SUBMIT_ERROR_SHOW;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -129,7 +128,6 @@ class UserControllerIT extends ControllerITBase {
                .andExpect(model().attribute(PAGE_CONFIG, UserPageConfig.get()))
                .andExpect(model().attribute(FORM_MODE, AppFormMode.CREATE))
                .andExpect(model().attribute(FORM_ACTION, AppRoutes.USERS_CREATE))
-               .andExpect(model().attribute(SUBMIT_ERROR_SHOW, true))
                .andExpect(model().attribute(SUBMIT_ERROR_MESSAGE_KEY, UserPageConfig.get().submitErrorMessageKeys.errorCreating))
                .andExpect(model().attribute(UserPageConfig.get().selectOptions.roleType, ROLE_TYPE_SELECT_OPTIONS))
                .andExpect(content().string(containsString("id=\"" + UserPageConfig.get().fragments.page + "\"")));
@@ -228,7 +226,6 @@ class UserControllerIT extends ControllerITBase {
                .andExpect(model().attribute(FORM_MODE, AppFormMode.CREATE))
                .andExpect(model().attribute(FORM_ACTION, AppRoutes.USERS_CREATE))
                .andExpect(model().attribute(FORM_OBJECT, new User()))
-               .andExpect(model().attribute(SUBMIT_ERROR_SHOW, true))
                .andExpect(model().attribute(SUBMIT_ERROR_MESSAGE_KEY, UserPageConfig.get().submitErrorMessageKeys.errorUpdating))
                .andExpect(model().attribute(UserPageConfig.get().selectOptions.roleType, ROLE_TYPE_SELECT_OPTIONS))
                .andExpect(content().string(containsString("id=\"" + UserPageConfig.get().fragments.page + "\"")));
@@ -292,7 +289,6 @@ class UserControllerIT extends ControllerITBase {
                .andExpect(model().attribute(FORM_MODE, AppFormMode.CREATE))
                .andExpect(model().attribute(FORM_ACTION, AppRoutes.USERS_CREATE))
                .andExpect(model().attribute(FORM_OBJECT, new User()))
-               .andExpect(model().attribute(SUBMIT_ERROR_SHOW, true))
                .andExpect(model().attribute(SUBMIT_ERROR_MESSAGE_KEY, UserPageConfig.get().submitErrorMessageKeys.errorDeletingSelf))
                .andExpect(content().string(containsString("id=\"" + UserPageConfig.get().fragments.page + "\"")));
     }
@@ -315,7 +311,6 @@ class UserControllerIT extends ControllerITBase {
                .andExpect(model().attribute(FORM_MODE, AppFormMode.CREATE))
                .andExpect(model().attribute(FORM_ACTION, AppRoutes.USERS_CREATE))
                .andExpect(model().attribute(FORM_OBJECT, new User()))
-               .andExpect(model().attribute(SUBMIT_ERROR_SHOW, true))
                .andExpect(model().attribute(SUBMIT_ERROR_MESSAGE_KEY, UserPageConfig.get().submitErrorMessageKeys.errorDeletingNotFound))
                .andExpect(content().string(containsString("id=\"" + UserPageConfig.get().fragments.page + "\"")));
 

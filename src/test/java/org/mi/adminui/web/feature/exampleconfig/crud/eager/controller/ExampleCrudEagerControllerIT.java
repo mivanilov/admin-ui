@@ -27,9 +27,6 @@ import static org.mi.adminui.web.core.configuration.constant.AppPageParams.FORM_
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.FORM_OBJECT;
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.PAGE_CONFIG;
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.SUBMIT_ERROR_MESSAGE_KEY;
-import static org.mi.adminui.web.core.configuration.constant.AppPageParams.SUBMIT_ERROR_SHOW;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -167,7 +164,6 @@ class ExampleCrudEagerControllerIT extends ControllerITBase {
                                                                                                              .map(ExampleConfig.Visibility::name)
                                                                                                              .collect(Collectors.toList())))
                .andExpect(model().attribute(ExampleCrudEagerPageConfig.get().selectOptions.exampleConfigType, List.of(exampleConfigType)))
-               .andExpect(model().attribute(SUBMIT_ERROR_SHOW, true))
                .andExpect(model().attribute(SUBMIT_ERROR_MESSAGE_KEY, ExampleCrudEagerPageConfig.get().submitErrorMessageKeys.errorCreating))
                .andExpect(content().string(containsString("id=\"" + ExampleCrudEagerPageConfig.get().fragments.form + "\"")));
 
@@ -315,7 +311,6 @@ class ExampleCrudEagerControllerIT extends ControllerITBase {
                                                                                                              .map(ExampleConfig.Visibility::name)
                                                                                                              .collect(Collectors.toList())))
                .andExpect(model().attribute(ExampleCrudEagerPageConfig.get().selectOptions.exampleConfigType, List.of(exampleConfigType)))
-               .andExpect(model().attribute(SUBMIT_ERROR_SHOW, true))
                .andExpect(model().attribute(SUBMIT_ERROR_MESSAGE_KEY, ExampleCrudEagerPageConfig.get().submitErrorMessageKeys.errorUpdating))
                .andExpect(content().string(containsString("id=\"" + ExampleCrudEagerPageConfig.get().fragments.page + "\"")));
 
@@ -380,7 +375,6 @@ class ExampleCrudEagerControllerIT extends ControllerITBase {
         mockMvc.perform(requestBuilder)
                .andExpect(status().isOk())
                .andExpect(model().attribute(PAGE_CONFIG, ExampleCrudEagerPageConfig.get()))
-               .andExpect(model().attribute(SUBMIT_ERROR_SHOW, true))
                .andExpect(model().attribute(SUBMIT_ERROR_MESSAGE_KEY, ExampleCrudEagerPageConfig.get().submitErrorMessageKeys.errorDeleting))
                .andExpect(model().attribute(FORM_MODE, AppFormMode.CREATE))
                .andExpect(model().attribute(FORM_ACTION, AppRoutes.EXAMPLE_CRUD_EAGER_CREATE))

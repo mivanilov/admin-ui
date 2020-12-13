@@ -27,7 +27,6 @@ import static org.mi.adminui.web.core.configuration.constant.AppPageParams.FORM_
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.FORM_OBJECT;
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.PAGE_CONFIG;
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.SUBMIT_ERROR_MESSAGE_KEY;
-import static org.mi.adminui.web.core.configuration.constant.AppPageParams.SUBMIT_ERROR_SHOW;
 
 @Controller
 public class ExampleCrudLazyController {
@@ -71,7 +70,6 @@ public class ExampleCrudLazyController {
         try {
             exampleConfigService.create(exampleConfig);
         } catch (RecordCreateException e) {
-            model.addAttribute(SUBMIT_ERROR_SHOW, true);
             model.addAttribute(SUBMIT_ERROR_MESSAGE_KEY, ExampleCrudLazyPageConfig.get().submitErrorMessageKeys.errorCreating);
 
             return PAGE_FRAGMENT_PATH;
@@ -109,7 +107,6 @@ public class ExampleCrudLazyController {
         try {
             exampleConfigService.update(exampleConfig);
         } catch (RecordNotFoundException e) {
-            model.addAttribute(SUBMIT_ERROR_SHOW, true);
             model.addAttribute(SUBMIT_ERROR_MESSAGE_KEY, ExampleCrudLazyPageConfig.get().submitErrorMessageKeys.errorUpdating);
         }
 
@@ -138,7 +135,6 @@ public class ExampleCrudLazyController {
         try {
             exampleConfigService.delete(exampleConfig.getId());
         } catch (RecordNotFoundException e) {
-            model.addAttribute(SUBMIT_ERROR_SHOW, true);
             model.addAttribute(SUBMIT_ERROR_MESSAGE_KEY, ExampleCrudLazyPageConfig.get().submitErrorMessageKeys.errorDeleting);
             model.addAttribute(FORM_MODE, AppFormMode.CREATE);
             model.addAttribute(FORM_ACTION, AppRoutes.EXAMPLE_CRUD_LAZY_CREATE);

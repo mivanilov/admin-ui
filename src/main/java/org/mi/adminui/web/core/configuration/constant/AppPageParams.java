@@ -9,7 +9,6 @@ public class AppPageParams {
 
     public static final String RENDER_TABLE = "renderTable";
 
-    public static final String SUBMIT_ERROR_SHOW = "submitErrorShow";
     public static final String SUBMIT_ERROR_MESSAGE_KEY = "submitErrorMessageKey";
 
     private AppPageParams() {

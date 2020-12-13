@@ -27,7 +27,6 @@ import static org.mi.adminui.web.core.configuration.constant.AppPageParams.FORM_
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.FORM_OBJECT;
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.PAGE_CONFIG;
 import static org.mi.adminui.web.core.configuration.constant.AppPageParams.SUBMIT_ERROR_MESSAGE_KEY;
-import static org.mi.adminui.web.core.configuration.constant.AppPageParams.SUBMIT_ERROR_SHOW;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -165,7 +164,6 @@ class ExampleCrudLazyControllerIT extends ControllerITBase {
                                                                                                             .map(ExampleConfig.Visibility::name)
                                                                                                             .collect(Collectors.toList())))
                .andExpect(model().attribute(ExampleCrudLazyPageConfig.get().selectOptions.exampleConfigType, List.of(exampleConfigType)))
-               .andExpect(model().attribute(SUBMIT_ERROR_SHOW, true))
                .andExpect(model().attribute(SUBMIT_ERROR_MESSAGE_KEY, ExampleCrudLazyPageConfig.get().submitErrorMessageKeys.errorCreating))
                .andExpect(content().string(containsString("id=\"" + ExampleCrudLazyPageConfig.get().fragments.form + "\"")));
 
@@ -313,7 +311,6 @@ class ExampleCrudLazyControllerIT extends ControllerITBase {
                                                                                                             .map(ExampleConfig.Visibility::name)
                                                                                                             .collect(Collectors.toList())))
                .andExpect(model().attribute(ExampleCrudLazyPageConfig.get().selectOptions.exampleConfigType, List.of(exampleConfigType)))
-               .andExpect(model().attribute(SUBMIT_ERROR_SHOW, true))
                .andExpect(model().attribute(SUBMIT_ERROR_MESSAGE_KEY, ExampleCrudLazyPageConfig.get().submitErrorMessageKeys.errorUpdating))
                .andExpect(content().string(containsString("id=\"" + ExampleCrudLazyPageConfig.get().fragments.page + "\"")));
 
@@ -378,7 +375,6 @@ class ExampleCrudLazyControllerIT extends ControllerITBase {
         mockMvc.perform(requestBuilder)
                .andExpect(status().isOk())
                .andExpect(model().attribute(PAGE_CONFIG, ExampleCrudLazyPageConfig.get()))
-               .andExpect(model().attribute(SUBMIT_ERROR_SHOW, true))
                .andExpect(model().attribute(SUBMIT_ERROR_MESSAGE_KEY, ExampleCrudLazyPageConfig.get().submitErrorMessageKeys.errorDeleting))
                .andExpect(model().attribute(FORM_MODE, AppFormMode.CREATE))
                .andExpect(model().attribute(FORM_ACTION, AppRoutes.EXAMPLE_CRUD_LAZY_CREATE))

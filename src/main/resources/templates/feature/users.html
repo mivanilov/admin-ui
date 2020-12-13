@@ -8,7 +8,7 @@
 </head>
 <body>
 <div th:id="${pageConfig.fragments.page}" class="layout-medium" layout:fragment="content" th:fragment="pageFragment">
-    <div th:if="${submitErrorShow}">
+    <div th:if="${submitErrorMessageKey != null}">
         <div th:replace="~{core/component/submit-error :: error (${submitErrorMessageKey})}"></div>
     </div>
     <div th:id="${pageConfig.fragments.form}" class="mb-4" th:fragment="formFragment">
