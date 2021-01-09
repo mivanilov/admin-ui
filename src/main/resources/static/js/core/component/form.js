@@ -75,8 +75,7 @@ var appForm = (() => {
     function resolveResponseFragmentId(response) {
         const responseMatch = response.match('^<div id="([a-zA-Z0-9]+)"');
         const extractedFragmentId = responseMatch && responseMatch[1];
-        return [_pageConfig().fragments.page, _pageConfig().fragments.form, _pageConfig().fragments.table]
-            .find(fragmentId => fragmentId === extractedFragmentId);
+        return Object.values(_pageConfig().fragments).find(fragmentId => fragmentId === extractedFragmentId);
     }
 
     function _handleUnknownResponse(response) {
